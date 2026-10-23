@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>روزمرہ کا حساب کتاب</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f6f9; margin: 0; padding: 15px; color: #333; }
+        .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #1a73e8; margin-top: 0; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
+        button { width: 100%; background-color: #1a73e8; color: white; border: none; padding: 12px; font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #1557b0; }
+        .filters { display: flex; gap: 5px; margin: 15px 0; flex-wrap: wrap; }
+        .filters button { flex: 1; padding: 8px; font-size: 14px; background-color: #e8f0fe; color: #1a73e8; }
+        .filters button.active { background-color: #1a73e8; color: white; }
+        .custom-date { display: flex; gap: 5px; margin-bottom: 15px; }
+        .custom-date input { font-size: 12px; padding: 6px; }
+        .summary { background: #e6f4ea; padding: 12px; border-radius: 6px; font-size: 18px; font-weight: bold; text-align: center; color: #137333; margin-bottom: 15px; }
+        .list-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
+        .list-item .details { display: flex; flex-direction: column; }
+        .list-item .time { font-size: 11px; color: #777; }
+        .list-item .amount { font-weight: bold; color: #d93025; }
+        .print-btn { background-color: #34a853; margin-top: 15px; }
+        @media print {
+            body * { visibility: hidden; }
+            #printableArea, #printableArea * { visibility: visible; }
+            #printableArea { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>روزمرہ کا حساب کتاب</h2>
+    
+    <!-- انٹری فارم -->
+    <div class="no-print">
+        <div class="form-group">
+            <label>رقم (روپے):</label>
+            <input type="number" id="amount" placeholder="مثلاً: 100" required>
+        </div>
+        <div class="form-group">
+            <label>تفصیل / مد:</label>
+            <input type="text" id="desc" placeholder="مثلاً: چینی، پٹرول، دہی" required>
+        </div>
+        <button onclick="addExpense()">محفوظ کریں</button>
+        <hr style="margin: 20px 0; border: 0.5px solid #eee;">
+    </div>
+
+    <!-- فلٹرز -->
+    <div class="no-print">
+        <label>رپورٹ دکھائیں:</label>
+        <div class="filters">
+            <button onclick="filterData('today')" id="btn-today" class="active">آج</button>
+            <button onclick="filterData('week')" id="btn-week">اس ہفتے</button>
+            <button onclick="filterData('month')" id="btn-month">اس ماہ</button>
+            <button onclick="filterData('all')" id="btn-all">سب ریکارڈ</button>
+        </div>
+        <div class="custom-date">
+            <input type="date" id="startDate">
+            <input type="date" id="endDate">
+            <button onclick="filterCustomDate()" style="width: auto; padding: 6px 12px;">تلاش</button>
+        </div>
+    </div>
+
+    <!-- پرنٹ اور رسید کا حصہ -->
+    <div id="printableArea">
+        <div class="summary" id="totalSummary">کل خرچ: 0 روپے</div>
+        <div id="expenseList"></div>
+    </div>
+
+    <button class="print-btn no-print" onclick="window.print()">رسید / سلپ پرنٹ کریں</button>
+</div>
+
+<script>
+    let expenses = JSON.parse(localStorage.getItem('my_expenses')) || [];
+    let currentFilter = 'today';
+
+    function addExpense() {
+        const amount = document.getElementById('amount').value;
+        const desc = document.getElementById('desc').value;
+        if (!amount || !desc) { alert('براہ کرم رقم اور تفصیل درج کریں!'); return; }
+
+        const newExpense = {
+            id: Date.now(),
+            amount: parseFloat(amount),
+            desc: desc,
+            date: new Date().toISOString()
+        };
+
+        expenses.push(newExpense);
+        localStorage.setItem('my_expenses', JSON.stringify(expenses));
+        document.getElementById('amount').value = '';
+        document.getElementById('desc').value = '';
+        render();
+    }
+
+    function render(filteredData = null) {
+        const listDiv = document.getElementById('expenseList');
+        listDiv.innerHTML = '';
+        let listToDisplay = filteredData || getFilteredData(currentFilter);
+        let total = 0;
+
+        listToDisplay.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+        listToDisplay.forEach(item => {
+            total += item.amount;
+            const d = new Date(item.date);
+            const dateStr = d.toLocaleDateString('ur-PK') + ' ' + d.toLocaleTimeString('ur-PK', {hour: '2-digit', minute:'2-digit'});
+            
+            listDiv.innerHTML += `
+                <div class="list-item">
+                    <div class="details">
+                        <strong>${item.desc}</strong>
+                        <span class="time">${dateStr}</span>
+                    </div>
+                    <div class="amount">${item.amount} روپے</div>
+                </div>
+            `;
+        });
+
+        document.getElementById('totalSummary').innerText = `کل خرچ: ${total} روپے`;
+    }
+
+    function filterData(type) {
+        currentFilter = type;
+        document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
+        if(document.getElementById('btn-' + type)) document.getElementById('btn-' + type).classList.add('active');
+        render();
+    }
+
+    function getFilteredData(type) {
+        const now = new Date();
+        return expenses.filter(item => {
+            const itemDate = new Date(item.date);
+            if (type === 'today') {
+                return itemDate.toDateString() === now.toDateString();
+            } else if (type === 'week') {
+                const oneWeekAgo = new Date(now.setDate(now.getDate() - 7));
+                return itemDate >= oneWeekAgo;
+            } else if (type === 'month') {
+                return itemDate.getMonth() === new Date().getMonth() && itemDate.getFullYear() === new Date().getFullYear();
+            }
+            return true;
+        });
+    }
+
+    function filterCustomDate() {
+        const start = document.getElementById('startDate').value;
+        const end = document.getElementById('endDate').value;
+        if (!start || !end) { alert('براہ کرم دونوں تاریخیں منتخب کریں!'); return; }
+
+        const startDate = new Date(start);
+        startDate.setHours(0,0,0,0);
+        const endDate = new Date(end);
+        endDate.setHours(23,59,59,999);
+
+        const filtered = expenses.filter(item => {
+            const d = new Date(item.date);
+            return d >= startDate && d <= endDate;
+        });
+
+        document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
+        render(filtered);
+    }
+
+    // شروع میں آج کا ڈیٹا دکھائیں
+    render();
+</script>
+
+</body>
+</html>
