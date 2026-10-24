@@ -11,9 +11,10 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts & HTML2PDF Library for Perfect PDF -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
         :root {
             --bg-color: #f4f7f6;
@@ -256,6 +257,29 @@
             font-weight: bold;
             width: 100%;
         }
+
+        /* PDF Printable Template Styling */
+        #pdfTemplate {
+            display: none;
+            padding: 20px;
+            background: #ffffff;
+            color: #000000;
+            direction: rtl;
+        }
+        .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .pdf-table th, .pdf-table td {
+            border: 1px solid #333;
+            padding: 8px;
+            text-align: right;
+            font-size: 13px;
+        }
+        .pdf-table th {
+            background-color: #f0f0f0;
+        }
     </style>
 </head>
 <body>
@@ -288,13 +312,14 @@
 
         <div class="form-group">
             <label>تفصیل / مد (ذہین آٹو کیٹگری ڈٹیکٹر):</label>
-            <input type="text" id="desc" placeholder="مثلاً فرائز، چارجر، دوائی، وائی فائی" oninput="smartDetectCategory(this.value)">
+            <input type="text" id="desc" placeholder="مثلاً بیڈ، چارپائی، فرائز، چارجر" oninput="smartDetectCategory(this.value)">
         </div>
 
         <div class="form-group">
             <label>کیٹگری:</label>
             <select id="category">
                 <option value="عام (General)">عام (General)</option>
+                <option value="فرنیچر / گھریلو سامان">فرنیچر / گھریلو سامان</option>
                 <option value="ہوٹلنگ / کھانا">ہوٹلنگ / کھانا</option>
                 <option value="راشن / گروسری">راشن / گروسری</option>
                 <option value="گاڑی / فیول">گاڑی / فیول</option>
@@ -330,8 +355,19 @@
 
     <div class="action-btns" style="margin-top: 20px;">
         <button class="btn-excel" onclick="exportToExcel()">Excel Backup ڈاؤن لوڈ کریں</button>
-        <button class="btn-pdf" onclick="printPDF()">رسید / رپورٹ پرنٹ کریں (PDF)</button>
+        <button class="btn-pdf" onclick="generatePDF()">رسید / رپورٹ پرنٹ کریں (PDF)</button>
     </div>
+</div>
+
+<!-- Hidden Clean PDF Container -->
+<div id="pdfTemplate">
+    <div style="text-align: center; border-bottom: 2px solid #1b4d3e; padding-bottom: 10px;">
+        <h2 style="margin: 0; color: #1b4d3e;">Muhammad Rasoolnagri</h2>
+        <h4 style="margin: 5px 0;">روزمرہ اخراجات کی رپورٹ / رسید</h4>
+        <p style="margin: 0; font-size: 12px;" id="pdfDateText"></p>
+    </div>
+    <div id="pdfContent"></div>
+    <div style="margin-top: 15px; font-weight: bold; font-size: 16px; text-align: left;" id="pdfTotalText"></div>
 </div>
 
 <script>
@@ -341,7 +377,6 @@
         });
     }
 
-    // Automatic Data Restoration & Migration Logic
     function getMergedExpenses() {
         let keys = ['mr_expenses_master', 'mr_expenses_ai_v1', 'mr_expenses_v2', 'mr_expenses_only', 'expenses'];
         let allData = [];
@@ -384,8 +419,12 @@
     }
     saveMasterData();
 
-    // Expanded Multi-Language Semantic Auto-Category Engine
+    // Advanced Category Engine including Furniture & Household items
     const smartRules = [
+        {
+            category: 'فرنیچر / گھریلو سامان',
+            keywords: ['بیڈ', 'چارپائی', 'صوفہ', 'کرسی', 'میز', 'ٹیبل', 'الماری', 'گدا', 'میٹرس', 'پردے', 'فرنیچر', 'چادر', 'تکیہ', 'فوم']
+        },
         { 
             category: 'ہوٹلنگ / کھانا', 
             keywords: ['حریسہ', 'حلیم', 'روٹی', 'سالن', 'بریانی', 'چائے', 'ہوٹل', 'کھانا', 'برگر', 'پیزا', 'شوارما', 'کباب', 'تکہ', 'کڑاہی', 'نہاری', 'پائے', 'ناشتہ', 'مٹھائی', 'جلیبی', 'سموسہ', 'پکوڑے', 'دودھ', 'دہی', 'جوس', 'آئس کریم', 'کوکا کولا', 'کافی', 'فاسٹ فوڈ', 'فرائز', 'ونگز', 'زنگر', 'شوربا', 'سٹیک'] 
@@ -545,40 +584,7 @@
         render(filtered);
     }
 
-    // Dedicated Clean Print Window for Perfect PDF Generation
-    function printPDF() {
-        let total = expenses.reduce((sum, item) => sum + item.amount, 0);
-        let printWindow = window.open('', '_blank');
-        
-        let htmlContent = `
-            <!DOCTYPE html>
-            <html lang="ur" dir="rtl">
-            <head>
-                <meta charset="UTF-8">
-                <title>Muhammad Rasoolnagri - Expense Report</title>
-                <style>
-                    body { font-family: Tahoma, sans-serif; padding: 20px; color: #000; direction: rtl; }
-                    h2, p { text-align: center; margin: 5px 0; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                    th, td { border: 1px solid #333; padding: 10px; text-align: right; font-size: 14px; }
-                    th { background-color: #f2f2f2; }
-                    .total { margin-top: 15px; font-size: 18px; font-weight: bold; text-align: left; }
-                </style>
-            </head>
-            <body>
-                <h2>Muhammad Rasoolnagri</h2>
-                <p>روزمرہ اخراجات کی رپورٹ / رسید</p>
-                <p style="font-size: 12px; color: #666;">تاریخ: ${new Date().toLocaleDateString('en-GB')}</p>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>تاریخ</th>
-                            <th>تفصیل</th>
-                            <th>کیٹگری</th>
-                            <th>رقم</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${expenses.map(i => `
-                            <tr>
- 
+    // Direct High-Quality Native PDF Generation Logic
+    function generatePDF() {
+        const element = document.getElementById('pdfTemplate');
+        const pdfContent = d
