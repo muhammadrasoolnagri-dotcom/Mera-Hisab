@@ -5,20 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>روزمرہ کا حساب کتاب - Muhammad Rasoolnagri</title>
 
-    <!-- Full PWA Web Manifest Integration -->
-    <link rel="manifest" href="data:application/manifest+json;utf8,{
-        %22short_name%22:%22%D9%85%D9%8E%D8%B1%D8%A7%20%D8%AD%D9%80%D8%B3%D8%A7%D8%A8%22,
-        %22name%22:%22%D8%B1%D9%88%D8%B2%D9%85%D8%B1%D9%87%20%DA%A9%D8%A7%20%D8%AD%D8%B3%D8%A7%D8%A8%20%DA%A9%D8%AA%D8%A7%D8%A8%22,
-        %22icons%22:[{%22src%22:%22data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231b4d3e'/><text x='50%' y='65%' font-size='50' font-weight='bold' fill='white' text-anchor='middle'>MR</text></svg>%22,%22sizes%22:%22512x512%22,%22type%22:%22image/svg+xml%22}],
-        %22start_url%22:%22./%22,
-        %22background_color%22:%22#1b4d3e%22,
-        %22theme_color%22:%22#1b4d3e%22,
-        %22display%22:%22standalone%22
-    }">
-    <meta name="theme-color" content="#1b4d3e">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     
@@ -304,9 +290,6 @@
 <div class="container">
     <div class="header-top no-print">
         <button class="theme-toggle" onclick="toggleTheme()" id="themeIcon">🌙</button>
-        <button id="pwaBtn" onclick="installApp()" style="display:none; background:#1b4d3e; color:white; border:none; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer;">
-            📲 ایپ انسٹال کریں
-        </button>
     </div>
 
     <!-- Brand Header -->
@@ -327,12 +310,12 @@
     <div class="no-print">
         <div class="form-group">
             <label>رقم (روپے):</label>
-            <input type="number" id="amount" placeholder="مثلاً 500" required>
+            <input type="number" id="amount" placeholder="مثلاً 500">
         </div>
 
         <div class="form-group">
             <label>تفصیل / مد (ذہین سسٹم کیٹگری خود چنے گا):</label>
-            <input type="text" id="desc" placeholder="مثلاً حریسہ، سیمنٹ، 100 روپے فوٹو کاپی" oninput="autoDetectCategory(this.value)" required>
+            <input type="text" id="desc" placeholder="مثلاً حریسہ، سیمنٹ، 100 روپے فوٹو کاپی" oninput="autoDetectCategory(this.value)">
         </div>
 
         <div class="form-group">
@@ -378,13 +361,12 @@
 </div>
 
 <script>
-    let expenses = JSON.parse(localStorage.getItem('mr_expenses_only')) || [];
+    let expenses = JSON.parse(localStorage.getItem('mr_expenses_v2')) || [];
 
-    // Expanded Smart Category Rules with Comprehensive Pakistani Keywords
     const smartRules = [
         { 
             category: 'ہوٹلنگ / کھانا', 
-            keywords: ['حریسہ', 'حلیم', 'روٹی', 'سالن', 'بریانی', 'چائے', 'ہوٹل', 'کھانا', 'برگر', 'پیزا', 'شوارما', 'کباب', 'تکہ', 'کڑاہی', 'نہاری', 'پائے', 'ناشتہ', 'مٹھائی', 'جلیبی', 'سamosa', 'سموسہ', 'پکوڑے', 'دودھ', 'دہی', 'جوس', 'آئس کریم', 'کوڈ ڈرنک', 'کافی', 'فاسٹ فوڈ'] 
+            keywords: ['حریسہ', 'حلیم', 'روٹی', 'سالن', 'بریانی', 'چائے', 'ہوٹل', 'کھانا', 'برگر', 'پیزا', 'شوارما', 'کباب', 'تکہ', 'کڑاہی', 'نہاری', 'پائے', 'ناشتہ', 'مٹھائی', 'جلیبی', 'سموسہ', 'پکوڑے', 'دودھ', 'دہی', 'جوس', 'آئس کریم', 'کوکا کولا', 'کافی', 'فاسٹ فوڈ'] 
         },
         { 
             category: 'راشن / گروسری', 
@@ -418,7 +400,7 @@
         let matchedCategory = null;
 
         for (let rule of smartRules) {
-            if (rule.keywords.some(kw => text.toLowerCase().includes(kw.toLowerCase()))) {
+            if (rule.keywords.some(kw => text.includes(kw))) {
                 matchedCategory = rule.category;
                 break;
             }
@@ -437,9 +419,13 @@
     }
 
     function addExpense() {
-        const amount = document.getElementById('amount').value;
-        const desc = document.getElementById('desc').value;
-        const category = document.getElementById('category').value;
+        const amountInput = document.getElementById('amount');
+        const descInput = document.getElementById('desc');
+        const categorySelect = document.getElementById('category');
+
+        const amount = amountInput.value.trim();
+        const desc = descInput.value.trim();
+        const category = categorySelect.value;
 
         if (!amount || !desc) {
             alert('براہ کرم رقم اور تفصیل دونوں درج کریں۔');
@@ -457,8 +443,9 @@
         expenses.unshift(item);
         saveAndRender();
 
-        document.getElementById('amount').value = '';
-        document.getElementById('desc').value = '';
+        amountInput.value = '';
+        descInput.value = '';
+        categorySelect.value = 'عام (General)';
     }
 
     function deleteExpense(id) {
@@ -467,7 +454,7 @@
     }
 
     function saveAndRender() {
-        localStorage.setItem('mr_expenses_only', JSON.stringify(expenses));
+        localStorage.setItem('mr_expenses_v2', JSON.stringify(expenses));
         render(expenses);
     }
 
@@ -476,7 +463,7 @@
         const totalDisplay = document.getElementById('totalExpenseDisplay');
 
         let total = data.reduce((sum, item) => sum + item.amount, 0);
-        totalDisplay.innerText = `Rs ${total.toLocaleString()}`;
+        totalDisplay.innerText = 'Rs ' + total.toLocaleString();
 
         if (data.length === 0) {
             listContainer.innerHTML = '<p style="text-align:center; color:#888; padding:20px;">کوئی ریکارڈ موجود نہیں ہے۔</p>';
@@ -493,7 +480,7 @@
                     </div>
                     <div style="display:flex; align-items:center; gap:10px;">
                         <span class="list-item-amount">Rs ${item.amount} -</span>
-                        <button onclick="deleteExpense(${item.id})" style="background:none; border:none; color:#c62828; cursor:pointer;">🗑️</button>
+                        <button onclick="deleteExpense(${item.id})" style="background:none; border:none; color:#c62828; cursor:pointer; font-size:16px;">🗑️</button>
                     </div>
                 </div>
             `;
@@ -533,7 +520,7 @@
 
     function filterRecords(type) {
         document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
-        document.getElementById(`btn-${type}`).classList.add('active');
+        document.getElementById('btn-' + type).classList.add('active');
 
         const now = new Date();
         let filtered = expenses;
@@ -565,7 +552,7 @@
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = `Mera_Hisab_Report_${Date.now()}.csv`;
+        link.download = 'Mera_Hisab_Report_' + Date.now() + '.csv';
         link.click();
     }
 
@@ -575,25 +562,9 @@
         icon.innerText = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
     }
 
-    // PWA Trigger logic
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        const pwaBtn = document.getElementById('pwaBtn');
-        if (pwaBtn) pwaBtn.style.display = 'block';
-    });
+    render();
+</script>
 
-    function installApp() {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    document.getElementById('pwaBtn').style.display = 'none';
-                }
-                deferredPrompt = null;
-            });
-        }
-    }
+</body>
+</html>
 
- 
