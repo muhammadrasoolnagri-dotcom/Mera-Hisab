@@ -1,12 +1,17 @@
-<!DOCTYPE html>
+<!DOCTYPEhtml>
 <html lang="ur" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>روزمرہ کا حساب کتاب - Muhammad Rasoolnagri</title>
+    
+    <!-- PWA Web App Manifest -->
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIuixqtmIstmIsdmHIOC4gSDntI3YsSDaqtmI2KfYqCIsCiAgInNob3J0X25hbWUiOiAiIeixqtmIstmIscIsCiAgInN0YXJ0X3VybCI6ICIuLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2Y0ZjZmOSIsCiAgInRoZW1lX2NvbG9yIjogIiMxYjRkM2UiCiN9">
+    <meta name="theme-color" content="#1b4d3e">
+
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    
     <style>
         :root {
             --bg-color: #f4f7f6;
@@ -14,7 +19,6 @@
             --text-color: #333333;
             --primary: #1b4d3e;
             --primary-accent: #2c7a5f;
-            --income-color: #2e7d32;
             --expense-color: #c62828;
             --border-color: #e0e0e0;
         }
@@ -23,192 +27,178 @@
             --bg-color: #121212;
             --card-bg: #1e1e1e;
             --text-color: #e0e0e0;
-            --primary: #2c7a5f;
-            --primary-accent: #3d9978;
             --border-color: #333333;
         }
 
+        * {
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Noto Nastaliq Urdu', Tahoma, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
         body {
-            font-family: 'Poppins', 'Noto Nastaliq Urdu', sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-color);
             margin: 0;
             padding: 15px;
-            transition: all 0.3s ease;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
         }
 
         .container {
+            width: 100%;
             max-width: 500px;
-            margin: 0 auto;
             background: var(--card-bg);
-            border-radius: 20px;
             padding: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-
-        .brand-header {
-            text-align: center;
-            padding-bottom: 15px;
-            border-bottom: 2px dashed var(--border-color);
-            margin-bottom: 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
             position: relative;
         }
 
-        .brand-logo {
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        .brand-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo-badge {
             width: 60px;
             height: 60px;
             background: linear-gradient(135deg, #1b4d3e, #2c7a5f);
-            color: white;
+            color: #ffffff;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
             font-size: 22px;
-            margin: 0 auto 10px auto;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            font-weight: 700;
+            margin: 0 auto 8px auto;
+            box-shadow: 0 4px 10px rgba(27, 77, 62, 0.3);
         }
 
-        .developer-title {
+        .developer-tag {
             font-size: 11px;
-            color: #888;
-            letter-spacing: 1px;
+            color: #777777;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
             margin: 0;
         }
 
-        .developer-name {
+        .brand-name {
             font-size: 18px;
             font-weight: 700;
-            color: var(--primary-accent);
-            margin: 2px 0;
+            color: var(--primary);
+            margin: 2px 0 0 0;
         }
 
-        .app-title {
-            font-size: 20px;
+        h2 {
+            text-align: center;
+            color: var(--primary);
             margin-top: 10px;
-            font-weight: 700;
-        }
-
-        .theme-toggle {
-            position: absolute;
-            top: 0;
-            left: 0;
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-        }
-
-        .summary-cards {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
             margin-bottom: 20px;
+            font-size: 22px;
         }
 
-        .card {
-            padding: 10px;
+        .dashboard-single {
+            background: linear-gradient(135deg, #c62828, #e53935);
+            color: white;
+            padding: 20px;
             border-radius: 12px;
             text-align: center;
-            color: white;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(198, 40, 40, 0.2);
         }
 
-        .card-income { background: #2e7d32; }
-        .card-expense { background: #c62828; }
-        .card-balance { background: #1565c0; }
+        .dashboard-single span {
+            font-size: 14px;
+            display: block;
+            opacity: 0.9;
+        }
 
-        .card h4 { margin: 0; font-size: 11px; opacity: 0.9; }
-        .card p { margin: 5px 0 0 0; font-size: 14px; font-weight: bold; }
+        .dashboard-single strong {
+            font-size: 28px;
+            margin-top: 5px;
+            display: block;
+        }
 
         .form-group {
-            margin-bottom: 12px;
+            margin-bottom: 15px;
         }
 
         label {
             display: block;
-            margin-bottom: 5px;
-            font-size: 13px;
+            margin-bottom: 6px;
             font-weight: 600;
+            font-size: 14px;
         }
 
         input, select {
             width: 100%;
             padding: 12px;
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            background: var(--bg-color);
+            border-radius: 8px;
+            font-size: 15px;
+            background-color: var(--card-bg);
             color: var(--text-color);
-            box-sizing: border-box;
-            font-size: 14px;
         }
 
-        .type-selector {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        .type-btn {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            background: var(--bg-color);
-            color: var(--text-color);
-            cursor: pointer;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .type-btn.active.expense { background: #c62828; color: white; border-color: #c62828; }
-        .type-btn.active.income { background: #2e7d32; color: white; border-color: #2e7d32; }
-
-        .btn {
+        button.btn-primary {
             width: 100%;
-            padding: 12px;
+            background-color: var(--primary);
+            color: white;
             border: none;
-            border-radius: 10px;
-            font-weight: bold;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
             cursor: pointer;
-            margin-top: 5px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(27, 77, 62, 0.2);
         }
-
-        .btn-primary { background: var(--primary-accent); color: white; }
-        .btn-excel { background: #1f7244; color: white; margin-top: 10px; }
-        .btn-pdf { background: #d32f2f; color: white; margin-top: 10px; }
 
         .filters {
             display: flex;
-            gap: 5px;
-            margin: 20px 0 10px 0;
-            overflow-x: auto;
+            gap: 6px;
+            margin: 20px 0 15px 0;
+            flex-wrap: wrap;
         }
 
-        .filter-btn {
+        .filters button {
             flex: 1;
             padding: 8px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-color);
+            font-size: 13px;
+            background-color: var(--bg-color);
             color: var(--text-color);
-            border-radius: 8px;
-            font-size: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
             cursor: pointer;
-            white-space: nowrap;
         }
 
-        .filter-btn.active {
-            background: var(--primary);
+        .filters button.active {
+            background-color: var(--primary);
             color: white;
+            border-color: var(--primary);
         }
 
-        .entry-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        .custom-date {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
         }
 
-        .entry-item {
+        .list-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -216,278 +206,364 @@
             border-bottom: 1px solid var(--border-color);
         }
 
-        .entry-details {
+        .list-item-details {
             display: flex;
             flex-direction: column;
         }
 
-        .entry-title { font-weight: bold; font-size: 14px; }
-        .entry-meta { font-size: 11px; color: #777; }
-        .entry-amount { font-weight: bold; }
-        .amount-expense { color: #c62828; }
-        .amount-income { color: #2e7d32; }
-
-        .badge {
-            display: inline-block;
-            padding: 2px 6px;
-            font-size: 10px;
-            border-radius: 4px;
-            background: #eee;
-            color: #333;
-            margin-right: 5px;
+        .list-item-title {
+            font-weight: 600;
+            font-size: 15px;
         }
 
-        .delete-btn {
-            background: none;
-            border: none;
-            color: #ff5252;
-            cursor: pointer;
+        .list-item-sub {
+            font-size: 12px;
+            color: #888888;
+            margin-top: 2px;
+        }
+
+        .list-item-amount {
+            font-weight: bold;
             font-size: 16px;
+            color: var(--expense-color);
+        }
+
+        .action-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-excel {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
+
+        .btn-pdf {
+            background-color: #c62828;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
+
+        /* Printable Area Formatting for Perfect PDF/Print */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printableArea, #printableArea * {
+                visibility: visible;
+            }
+            #printableArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                color: #000 !important;
+                background: #fff !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+            .print-table th, .print-table td {
+                border: 1px solid #ddd;
+                padding: 10px;
+                text-align: right;
+            }
+            .print-table th {
+                background-color: #f2f2f2;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="brand-header">
-        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-        <div class="brand-logo">MR</div>
-        <p class="developer-title">DEVELOPED BY</p>
-        <div class="developer-name">Muhammad Rasoolnagri</div>
-        <div class="app-title">روزمرہ کا حساب کتاب</div>
-    </div>
-
-    <!-- Summary Dashboard -->
-    <div class="summary-cards">
-        <div class="card card-income">
-            <h4>کل آمدنی</h4>
-            <p id="totalIncome">Rs 0</p>
-        </div>
-        <div class="card card-expense">
-            <h4>کل خرچ</h4>
-            <p id="totalExpense">Rs 0</p>
-        </div>
-        <div class="card card-balance">
-            <h4>باقی بیلنس</h4>
-            <p id="totalBalance">Rs 0</p>
+    <div class="header-top no-print">
+        <button class="theme-toggle" onclick="toggleTheme()" id="themeIcon">🌙</button>
+        <div id="pwaInstallBanner" style="display:none;">
+            <button onclick="installPWA()" style="background:#1b4d3e; color:white; border:none; padding:4px 10px; border-radius:4px; font-size:12px;">App Install کریں 📲</button>
         </div>
     </div>
 
-    <!-- Type Selector -->
-    <div class="type-selector">
-        <div class="type-btn active expense" id="btnExpense" onclick="setType('expense')">خرچ (Expense)</div>
-        <div class="type-btn" id="btnIncome" onclick="setType('income')">آمدنی (Income)</div>
+    <!-- Brand Header -->
+    <div class="brand-section">
+        <div class="logo-badge">MR</div>
+        <p class="developer-tag">DEVELOPED BY</p>
+        <h3 class="brand-name">Muhammad Rasoolnagri</h3>
     </div>
 
-    <!-- Form -->
-    <div class="form-group">
-        <label>رقم (روپے):</label>
-        <input type="number" id="amount" placeholder="مثلاً: 500">
+    <h2>روزمرہ کا حساب کتاب</h2>
+
+    <!-- Total Expense Dashboard -->
+    <div class="dashboard-single">
+        <span>کل خرچ (Total Expenses)</span>
+        <strong id="totalExpenseDisplay">Rs 0</strong>
     </div>
 
-    <div class="form-group">
-        <label>تفصیل / مد (ذہین سسٹم کیٹگری خود چنے گا):</label>
-        <input type="text" id="description" placeholder="مثلاً: 100 چینی، پیٹرول، بجلی کا بل" oninput="autoDetectCategory(this.value)">
+    <div class="no-print">
+        <div class="form-group">
+            <label>رقم (روپے):</label>
+            <input type="number" id="amount" placeholder="مثلاً 500" required>
+        </div>
+
+        <div class="form-group">
+            <label>تفصیل / مد (ذہین سسٹم کیٹگری خود چنے گا):</label>
+            <input type="text" id="desc" placeholder="مثلاً سیمنٹ، 100 روپے فوٹو کاپی، موبائل پیکج" oninput="autoDetectCategory(this.value)" required>
+        </div>
+
+        <div class="form-group">
+            <label>کیٹگری:</label>
+            <select id="category">
+                <option value="عام (General)">عام (General)</option>
+                <option value="راشن / گروسری">راشن / گروسری</option>
+                <option value="گاڑی / فیول">گاڑی / فیول</option>
+                <option value="ہوٹلنگ / کھانا">ہوٹلنگ / کھانا</option>
+                <option value="بل / یوٹیلیٹی">بل / یوٹیلیٹی</option>
+            </select>
+        </div>
+
+        <button class="btn-primary" onclick="addExpense()">محفوظ کریں</button>
+        <hr style="margin: 20px 0; border: 0.1px solid var(--border-color);">
+
+        <div class="filters">
+            <button onclick="filterRecords('all')" id="btn-all" class="active">تمام ریکارڈ</button>
+            <button onclick="filterRecords('today')" id="btn-today">آج</button>
+            <button onclick="filterRecords('week')" id="btn-week">اس ہفتے</button>
+            <button onclick="filterRecords('month')" id="btn-month">اس ماہ</button>
+        </div>
+
+        <div class="custom-date">
+            <input type="date" id="startDate">
+            <input type="date" id="endDate">
+            <button onclick="filterCustomDate()" style="width: auto; padding: 6px 12px;">تلاش</button>
+        </div>
     </div>
 
-    <div class="form-group">
-        <label>کیٹگری:</label>
-        <select id="category">
-            <option value="عام">عام (General)</option>
-            <option value="راشن / گروسری">راشن / گروسری</option>
-            <option value="گاڑی / فیول">گاڑی / فیول</option>
-            <option value="ہوٹلنگ / کھانا">ہوٹلنگ / کھانا</option>
-            <option value="ماہانہ بلز">ماہانہ بلز</option>
-            <option value="آمدنی / تنخواہ">آمدنی / تنخواہ</option>
-        </select>
+    <!-- Printable Report View -->
+    <div id="printableArea">
+        <div id="expensesList"></div>
     </div>
 
-    <button class="btn btn-primary" onclick="addEntry()">محفوظ کریں</button>
-
-    <!-- Filters -->
-    <div class="filters">
-        <button class="filter-btn active" onclick="filterData('all')">تمام ریکارڈ</button>
-        <button class="filter-btn" onclick="filterData('today')">آج</button>
-        <button class="filter-btn" onclick="filterData('week')">اس ہفتے</button>
-        <button class="filter-btn" onclick="filterData('month')">اس ماہ</button>
+    <div class="action-btns no-print">
+        <button class="btn-excel" onclick="exportToExcel()">Excel Backup ڈاؤن لوڈ کریں</button>
+        <button class="btn-pdf" onclick="printPDF()">رسید / رپورٹ پرنٹ کریں (PDF)</button>
     </div>
-
-    <!-- List -->
-    <ul class="entry-list" id="entryList"></ul>
-
-    <!-- Export Buttons -->
-    <button class="btn btn-excel" onclick="exportToCSV()">Excel Backup ڈاؤن لوڈ کریں</button>
-    <button class="btn btn-pdf" onclick="generatePDF()">رسید / رپورٹ پرنٹ کریں (PDF)</button>
 </div>
 
 <script>
-    let entries = JSON.parse(localStorage.getItem('mr_entries')) || [];
-    let currentType = 'expense';
-    let currentFilter = 'all';
+    let expenses = JSON.parse(localStorage.getItem('mr_expenses_only')) || [];
 
-    function setType(type) {
-        currentType = type;
-        document.getElementById('btnExpense').classList.toggle('active', type === 'expense');
-        document.getElementById('btnIncome').classList.toggle('active', type === 'income');
-        if(type === 'income') {
-            document.getElementById('category').value = 'آمدنی / تنخواہ';
-        }
-    }
+    // Advanced Smart Category Detection Rules
+    const smartRules = [
+        { keywords: ['سیمنٹ', 'بجری', 'اینٹ', 'ریت', 'کنسٹرکشن', 'تعمیر', 'پینٹ', 'لوہا'], category: 'کنسٹرکشن / تعمیرات' },
+        { keywords: ['پیکج', 'موبائل', 'ایزی لوڈ', 'بیلنس', 'کال', 'نیٹ', 'ڈیٹا'], category: 'موبائل / کریڈٹ' },
+        { keywords: ['فوٹو کاپی', 'کاپی', 'پرنٹ', 'کاغذ', 'پنسل', 'پین', 'اسٹیشنری'], category: 'اسٹیشنری / پرنٹنگ' },
+        { keywords: ['چینی', 'پتی', 'دال', 'چاول', 'گھی', 'تیل', 'صابن', 'سودا', 'راشن'], category: 'راشن / گروسری' },
+        { keywords: ['پیٹرول', 'ڈیزل', 'ٹیوننگ', 'سروس', 'انجن', 'مائل', 'واش', 'ٹائر', 'گاڑی'], category: 'گاڑی / فیول' },
+        { keywords: ['روٹی', 'سالن', 'بریانی', 'چائے', 'ہوٹل', 'کھانا', 'برگر', 'پیزا'], category: 'ہوٹلنگ / کھانا' },
+        { keywords: ['بجلی', 'گیس', 'پانی', 'انٹرنیٹ', 'بل'], category: 'بل / یوٹیلیٹی' }
+    ];
 
     function autoDetectCategory(text) {
-        if (currentType === 'income') return;
-        text = text.toLowerCase();
-        const catSelect = document.getElementById('category');
+        if (!text) return;
+        const select = document.getElementById('category');
+        let matchedCategory = null;
 
-        if (/چینی|آٹا|گھی|دال|صابن|دودھ|سبزی|گوشت|راشن|گروسری/.test(text)) {
-            catSelect.value = 'راشن / گروسری';
-        } else if (/پیٹرول|ڈیزل|سروس|ٹیوننگ|آئل|ٹائر|گاڑی|بائیک/.test(text)) {
-            catSelect.value = 'گاڑی / فیول';
-        } else if (/برگر|روٹی|ریسٹورنٹ|ڈنر|ہوٹل|چائے|کھانا|لنچ/.test(text)) {
-            catSelect.value = 'ہوٹلنگ / کھانا';
-        } else if (/بجلی|گیس|وائی فائی|نیٹ|ریچارج|موبائل|بل/.test(text)) {
-            catSelect.value = 'ماہانہ بلز';
+        for (let rule of smartRules) {
+            if (rule.keywords.some(kw => text.toLowerCase().includes(kw))) {
+                matchedCategory = rule.category;
+                break;
+            }
+        }
+
+        if (matchedCategory) {
+            let optionExists = Array.from(select.options).some(opt => opt.value === matchedCategory);
+            if (!optionExists) {
+                let newOpt = document.createElement('option');
+                newOpt.value = matchedCategory;
+                newOpt.innerText = matchedCategory;
+                select.appendChild(newOpt);
+            }
+            select.value = matchedCategory;
         }
     }
 
-    function addEntry() {
-        const amount = parseFloat(document.getElementById('amount').value);
-        const description = document.getElementById('description').value.trim();
+    function addExpense() {
+        const amount = document.getElementById('amount').value;
+        const desc = document.getElementById('desc').value;
         const category = document.getElementById('category').value;
 
-        if (!amount || !description) {
-            alert('براہ کرم رقم اور تفصیل دونوں درج کریں!');
+        if (!amount || !desc) {
+            alert('براہ کرم رقم اور تفصیل دونوں درج کریں۔');
             return;
         }
 
-        const newEntry = {
+        const item = {
             id: Date.now(),
-            amount: amount,
-            description: description,
+            amount: parseFloat(amount),
+            desc: desc,
             category: category,
-            type: currentType,
-            date: new Date().toISOString()
+            date: new Date().toLocaleDateString('en-GB')
         };
 
-        entries.unshift(newEntry);
+        expenses.unshift(item);
         saveAndRender();
 
         document.getElementById('amount').value = '';
-        document.getElementById('description').value = '';
+        document.getElementById('desc').value = '';
     }
 
-    function deleteEntry(id) {
-        entries = entries.filter(e => e.id !== id);
+    function deleteExpense(id) {
+        expenses = expenses.filter(item => item.id !== id);
         saveAndRender();
     }
 
     function saveAndRender() {
-        localStorage.setItem('mr_entries', JSON.stringify(entries));
-        renderList();
-        updateDashboard();
+        localStorage.setItem('mr_expenses_only', JSON.stringify(expenses));
+        render(expenses);
     }
 
-    function updateDashboard() {
-        let income = entries.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
-        let expense = entries.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
-        let balance = income - expense;
+    function render(data = expenses) {
+        const listContainer = document.getElementById('expensesList');
+        const totalDisplay = document.getElementById('totalExpenseDisplay');
 
-        document.getElementById('totalIncome').innerText = `Rs ${income}`;
-        document.getElementById('totalExpense').innerText = `Rs ${expense}`;
-        document.getElementById('totalBalance').innerText = `Rs ${balance}`;
-    }
+        let total = data.reduce((sum, item) => sum + item.amount, 0);
+        totalDisplay.innerText = `Rs ${total.toLocaleString()}`;
 
-    function filterData(filter) {
-        currentFilter = filter;
-        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-        renderList();
-    }
+        if (data.length === 0) {
+            listContainer.innerHTML = '<p style="text-align:center; color:#888; padding:20px;">کوئی ریکارڈ موجود نہیں ہے۔</p>';
+            return;
+        }
 
-    function renderList() {
-        const list = document.getElementById('entryList');
-        list.innerHTML = '';
-
-        let filtered = entries.filter(e => {
-            const date = new Date(e.date);
-            const today = new Date();
-            if (currentFilter === 'today') {
-                return date.toDateString() === today.toDateString();
-            } else if (currentFilter === 'week') {
-                const oneWeekAgo = new Date(today.setDate(today.getDate() - 7));
-                return date >= oneWeekAgo;
-            } else if (currentFilter === 'month') {
-                return date.getMonth() === new Date().getMonth() && date.getFullYear() === new Date().getFullYear();
-            }
-            return true;
-        });
-
-        filtered.forEach(e => {
-            const li = document.createElement('li');
-            li.className = 'entry-item';
-            const formattedDate = new Date(e.date).toLocaleDateString('ur-PK');
-
-            li.innerHTML = `
-                <div class="entry-details">
-                    <span class="entry-title">${e.description}</span>
-                    <span class="entry-meta">
-                        <span class="badge">${e.category}</span>
-                        ${formattedDate}
-                    </span>
-                </div>
-                <div>
-                    <span class="entry-amount ${e.type === 'income' ? 'amount-income' : 'amount-expense'}">
-                        ${e.type === 'income' ? '+' : '-'} Rs ${e.amount}
-                    </span>
-                    <button class="delete-btn" onclick="deleteEntry(${e.id})">🗑️</button>
+        let html = '<div class="no-print">';
+        data.forEach(item => {
+            html += `
+                <div class="list-item">
+                    <div class="list-item-details">
+                        <span class="list-item-title">${item.desc}</span>
+                        <span class="list-item-sub">${item.category} | ${item.date}</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span class="list-item-amount">Rs ${item.amount} -</span>
+                        <button onclick="deleteExpense(${item.id})" style="background:none; border:none; color:#c62828; cursor:pointer;">🗑️</button>
+                    </div>
                 </div>
             `;
-            list.appendChild(li);
         });
+        html += '</div>';
+
+        // Clean Print View Table for Perfect PDF
+        html += `
+            <div class="printable-only" style="display:none;">
+                <h2 style="text-align:center; margin-bottom:5px;">Muhammad Rasoolnagri</h2>
+                <p style="text-align:center; margin-top:0; font-size:12px;">اخراجات رپورٹ - تاریخ: ${new Date().toLocaleDateString('en-GB')}</p>
+                <table class="print-table">
+                    <thead>
+                        <tr>
+                            <th>تاریخ</th>
+                            <th>تفصیل</th>
+                            <th>کیٹگری</th>
+                            <th>رقم</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(i => `
+                            <tr>
+                                <td>${i.date}</td>
+                                <td>${i.desc}</td>
+                                <td>${i.category}</td>
+                                <td>Rs ${i.amount}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <h3 style="text-align:left; margin-top:15px;">کل خرچ: Rs ${total.toLocaleString()}</h3>
+            </div>
+        `;
+
+        listContainer.innerHTML = html;
+    }
+
+    function filterRecords(type) {
+        document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
+        document.getElementById(`btn-${type}`).classList.add('active');
+
+        const now = new Date();
+        let filtered = expenses;
+
+        if (type === 'today') {
+            const todayStr = now.toLocaleDateString('en-GB');
+            filtered = expenses.filter(i => i.date === todayStr);
+        } else if (type === 'week') {
+            const weekAgo = new Date(now.setDate(now.getDate() - 7));
+            filtered = expenses.filter(i => new Date(i.id) >= weekAgo);
+        } else if (type === 'month') {
+            const currentMonth = new Date().getMonth();
+            filtered = expenses.filter(i => new Date(i.id).getMonth() === currentMonth);
+        }
+
+        render(filtered);
+    }
+
+    function printPDF() {
+        window.print();
+    }
+
+    function exportToExcel() {
+        let csv = 'Date,Description,Category,Amount\n';
+        expenses.forEach(i => {
+            csv += `"${i.date}","${i.desc}","${i.category}","${i.amount}"\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `Mera_Hisab_Report_${Date.now()}.csv`;
+        link.click();
     }
 
     function toggleTheme() {
         document.body.classList.toggle('dark-mode');
+        const icon = document.getElementById('themeIcon');
+        icon.innerText = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
     }
 
-    function exportToCSV() {
-        let csv = 'تاریخ,تفصیل,کیٹگری,قسم,رقم\n';
-        entries.forEach(e => {
-            csv += `"${new Date(e.date).toLocaleDateString()}","${e.description}","${e.category}","${e.type}","${e.amount}"\n`;
-        });
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = `Mera_Hisab_Backup_${new Date().toLocaleDateString()}.csv`;
-        link.click();
+    // PWA Offline & Installation Setup
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        document.getElementById('pwaInstallBanner').style.display = 'block';
+    });
+
+    function installPWA() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(() => {
+                document.getElementById('pwaInstallBanner').style.display = 'none';
+            });
+        }
     }
 
-    function generatePDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.text("Muhammad Rasoolnagri - Expense Report", 14, 15);
-        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 23);
-
-        const tableData = entries.map(e => [
-            new Date(e.date).toLocaleDateString(),
-            e.description,
-            e.category,
-            e.type === 'income' ? 'Income' : 'Expense',
-            `Rs ${e.amount}`
-        ]);
-
-        doc.autoTable({
-            head: [['Date', 'Description', 'Category', 'Type', 'Amount']],
-            body: tableData,
-            startY: 30
-        });
-
-        doc.save('Hisab_Report.pdf');
-    }
-
-    // Initial Load
-    saveAndRender();
+    render();
 </script>
+
 </body>
-    </html>
-        
+</html>
