@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ur" dir="rtl">
 <head>
@@ -11,9 +12,10 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
 
-    <!-- Google Fonts & HTML2PDF Library for Perfect PDF -->
+    <!-- Google Fonts & Direct PDF Generation Libraries -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
     <style>
         :root {
@@ -257,29 +259,6 @@
             font-weight: bold;
             width: 100%;
         }
-
-        /* PDF Printable Template Styling */
-        #pdfTemplate {
-            display: none;
-            padding: 20px;
-            background: #ffffff;
-            color: #000000;
-            direction: rtl;
-        }
-        .pdf-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        .pdf-table th, .pdf-table td {
-            border: 1px solid #333;
-            padding: 8px;
-            text-align: right;
-            font-size: 13px;
-        }
-        .pdf-table th {
-            background-color: #f0f0f0;
-        }
     </style>
 </head>
 <body>
@@ -355,19 +334,8 @@
 
     <div class="action-btns" style="margin-top: 20px;">
         <button class="btn-excel" onclick="exportToExcel()">Excel Backup ڈاؤن لوڈ کریں</button>
-        <button class="btn-pdf" onclick="generatePDF()">رسید / رپورٹ پرنٹ کریں (PDF)</button>
+        <button class="btn-pdf" onclick="generateDirectPDF()">رسید / رپورٹ پرنٹ کریں (PDF)</button>
     </div>
-</div>
-
-<!-- Hidden Clean PDF Container -->
-<div id="pdfTemplate">
-    <div style="text-align: center; border-bottom: 2px solid #1b4d3e; padding-bottom: 10px;">
-        <h2 style="margin: 0; color: #1b4d3e;">Muhammad Rasoolnagri</h2>
-        <h4 style="margin: 5px 0;">روزمرہ اخراجات کی رپورٹ / رسید</h4>
-        <p style="margin: 0; font-size: 12px;" id="pdfDateText"></p>
-    </div>
-    <div id="pdfContent"></div>
-    <div style="margin-top: 15px; font-weight: bold; font-size: 16px; text-align: left;" id="pdfTotalText"></div>
 </div>
 
 <script>
@@ -419,7 +387,7 @@
     }
     saveMasterData();
 
-    // Advanced Category Engine including Furniture & Household items
+    // Advanced Category Engine
     const smartRules = [
         {
             category: 'فرنیچر / گھریلو سامان',
@@ -584,7 +552,37 @@
         render(filtered);
     }
 
-    // Direct High-Quality Native PDF Generation Logic
-    function generatePDF() {
-        const element = document.getElementById('pdfTemplate');
-        const pdfContent = d
+    // Direct Instant Downloadable PDF Logic (No Print Screen Error)
+    function generateDirectPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        doc.setFontSize(18);
+        doc.text("Muhammad Rasoolnagri", 105, 15, { align: "center" });
+        
+        doc.setFontSize(12);
+        doc.text("Expense Report - Mera Hisab", 105, 23, { align: "center" });
+        doc.text("Date: " + new Date().toLocaleDateString('en-GB'), 105, 29, { align: "center" });
+
+        let tableRows = [];
+        let total = 0;
+
+        expenses.forEach(item => {
+            total += item.amount;
+            tableRows.push([item.date, item.desc, item.category, "Rs " + item.amount.toLocaleString()]);
+        });
+
+        doc.autoTable({
+            head: [['Date', 'Description', 'Category', 'Amount']],
+            body: tableRows,
+            startY: 35,
+            theme: 'grid',
+            headStyles: { fillColor: [27, 77, 62], textColor: 255 },
+            styles: { fontSize: 10, halign: 'center' }
+        });
+
+        let finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(14);
+        doc.text("Total Expense: Rs " + total.toLocaleString(), 14, finalY);
+
+        doc.save("Mera
