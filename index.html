@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ur" dir="rtl">
 <head>
@@ -12,10 +11,10 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
 
-    <!-- Google Fonts & Direct PDF Generation Libraries -->
+    <!-- Google Fonts & Direct Canvas/PDF Libraries -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
     <style>
         :root {
@@ -259,6 +258,32 @@
             font-weight: bold;
             width: 100%;
         }
+
+        /* Direct Download Receipt Card (Render Container) */
+        #receiptArea {
+            background: #ffffff;
+            color: #000000;
+            padding: 20px;
+            border-radius: 8px;
+            direction: rtl;
+            position: absolute;
+            left: -9999px;
+            width: 400px;
+        }
+        .receipt-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .receipt-table th, .receipt-table td {
+            border: 1px solid #333;
+            padding: 8px;
+            text-align: right;
+            font-size: 12px;
+        }
+        .receipt-table th {
+            background-color: #f0f0f0;
+        }
     </style>
 </head>
 <body>
@@ -334,8 +359,19 @@
 
     <div class="action-btns" style="margin-top: 20px;">
         <button class="btn-excel" onclick="exportToExcel()">Excel Backup ڈاؤن لوڈ کریں</button>
-        <button class="btn-pdf" onclick="generateDirectPDF()">رسید / رپورٹ پرنٹ کریں (PDF)</button>
+        <button class="btn-pdf" onclick="downloadDirectPDF()">رسید / رپورٹ ڈاؤن لوڈ کریں (PDF)</button>
     </div>
+</div>
+
+<!-- Offscreen Receipt Canvas Element -->
+<div id="receiptArea">
+    <div style="text-align: center; border-bottom: 2px solid #1b4d3e; padding-bottom: 8px;">
+        <h3 style="margin:0; color:#1b4d3e;">Muhammad Rasoolnagri</h3>
+        <p style="margin:3px 0; font-size:12px;">اخراجات رپورٹ / رسید</p>
+        <p style="margin:0; font-size:10px; color:#555;" id="receiptDateText"></p>
+    </div>
+    <div id="receiptTableBox"></div>
+    <div style="margin-top: 12px; font-weight: bold; font-size: 14px; text-align: left;" id="receiptTotalText"></div>
 </div>
 
 <script>
@@ -387,7 +423,7 @@
     }
     saveMasterData();
 
-    // Advanced Category Engine
+    // Smart Rules Engine
     const smartRules = [
         {
             category: 'فرنیچر / گھریلو سامان',
@@ -549,40 +585,4 @@
             filtered = expenses.filter(i => new Date(i.id).getMonth() === currentMonth);
         }
 
-        render(filtered);
-    }
-
-    // Direct Instant Downloadable PDF Logic (No Print Screen Error)
-    function generateDirectPDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        doc.setFontSize(18);
-        doc.text("Muhammad Rasoolnagri", 105, 15, { align: "center" });
-        
-        doc.setFontSize(12);
-        doc.text("Expense Report - Mera Hisab", 105, 23, { align: "center" });
-        doc.text("Date: " + new Date().toLocaleDateString('en-GB'), 105, 29, { align: "center" });
-
-        let tableRows = [];
-        let total = 0;
-
-        expenses.forEach(item => {
-            total += item.amount;
-            tableRows.push([item.date, item.desc, item.category, "Rs " + item.amount.toLocaleString()]);
-        });
-
-        doc.autoTable({
-            head: [['Date', 'Description', 'Category', 'Amount']],
-            body: tableRows,
-            startY: 35,
-            theme: 'grid',
-            headStyles: { fillColor: [27, 77, 62], textColor: 255 },
-            styles: { fontSize: 10, halign: 'center' }
-        });
-
-        let finalY = doc.lastAutoTable.finalY + 10;
-        doc.setFontSize(14);
-        doc.text("Total Expense: Rs " + total.toLocaleString(), 14, finalY);
-
-        doc.save("Mera
+     
