@@ -257,36 +257,40 @@
             width: 100%;
         }
 
+        /* Fixed PDF Print Styling */
         @media print {
-            body * {
-                visibility: hidden;
-            }
-            #printableArea, #printableArea * {
-                visibility: visible;
-            }
-            #printableArea {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                color: #000 !important;
+            body {
                 background: #fff !important;
+                color: #000 !important;
+                padding: 0 !important;
+            }
+            .container {
+                box-shadow: none !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                padding: 0 !important;
             }
             .no-print {
                 display: none !important;
             }
+            .print-header {
+                text-align: center;
+                margin-bottom: 20px;
+            }
             .print-table {
                 width: 100%;
                 border-collapse: collapse;
-                margin-top: 20px;
+                margin-top: 15px;
             }
             .print-table th, .print-table td {
-                border: 1px solid #ddd;
-                padding: 10px;
+                border: 1px solid #444;
+                padding: 8px;
                 text-align: right;
+                font-size: 14px;
             }
             .print-table th {
-                background-color: #f2f2f2;
+                background-color: #f2f2f2 !important;
+                font-weight: bold;
             }
         }
     </style>
@@ -320,8 +324,8 @@
         </div>
 
         <div class="form-group">
-            <label>تفصیل / مد (ذہین سسٹم کیٹگری خود چنے گا):</label>
-            <input type="text" id="desc" placeholder="مثلاً حریسہ، سیمنٹ، 100 روپے فوٹو کاپی" oninput="autoDetectCategory(this.value)">
+            <label>تفصیل / مد (ذہین آٹو کیٹگری ڈٹیکٹر):</label>
+            <input type="text" id="desc" placeholder="مثلاً فرائز، چارجر، دوائی، وائی فائی" oninput="smartDetectCategory(this.value)">
         </div>
 
         <div class="form-group">
@@ -335,6 +339,9 @@
                 <option value="موبائل / کریڈٹ">موبائل / کریڈٹ</option>
                 <option value="اسٹیشنری / پرنٹنگ">اسٹیشنری / پرنٹنگ</option>
                 <option value="بل / یوٹیلیٹی">بل / یوٹیلیٹی</option>
+                <option value="میڈیکل / صحت">میڈیکل / صحت</option>
+                <option value="الیکٹرانکس / ڈیوائس">الیکٹرانکس / ڈیوائس</option>
+                <option value="فنانس / ٹرانسفر">فنانس / ٹرانسفر</option>
             </select>
         </div>
 
@@ -355,8 +362,12 @@
         </div>
     </div>
 
-    <!-- Printable Report View -->
+    <!-- Printable & Screen Report Area -->
     <div id="printableArea">
+        <div class="print-header">
+            <h2 style="margin:0;">Muhammad Rasoolnagri</h2>
+            <p style="margin:5px 0; font-size:13px;">اخراجات رپورٹ / رسید</p>
+        </div>
         <div id="expensesList"></div>
     </div>
 
@@ -367,57 +378,109 @@
 </div>
 
 <script>
-    // Register Service Worker for Real PWA Installability
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js').then(reg => {
-                console.log('Service Worker Registered Successfully');
-            }).catch(err => {
-                console.log('Service Worker Registration Failed', err);
-            });
+            navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
         });
     }
 
-    let expenses = JSON.parse(localStorage.getItem('mr_expenses_final')) || [];
+    // Automatic Data Restoration & Migration Logic
+    function getMergedExpenses() {
+        let keys = ['mr_expenses_master', 'mr_expenses_ai_v1', 'mr_expenses_v2', 'mr_expenses_only', 'expenses'];
+        let allData = [];
+        let seenIds = new Set();
 
+        keys.forEach(key => {
+            let item = localStorage.getItem(key);
+            if (item) {
+                try {
+                    let parsed = JSON.parse(item);
+                    if (Array.isArray(parsed)) {
+                        parsed.forEach(exp => {
+                            if (exp && exp.amount) {
+                                // Filtering expenses only
+                                if (!exp.type || exp.type === 'expense') {
+                                    let uniqueId = exp.id || (exp.desc + exp.amount + exp.date);
+                                    if (!seenIds.has(uniqueId)) {
+                                        seenIds.add(uniqueId);
+                                        allData.push({
+                                            id: exp.id || Date.now() + Math.random(),
+                                            amount: parseFloat(exp.amount),
+                                            desc: exp.desc || 'خرچ',
+                                            category: exp.category || 'عام (General)',
+                                            date: exp.date || new Date().toLocaleDateString('en-GB')
+                                        });
+                                    }
+                                }
+                            }
+                        });
+                    }
+                } catch(e){}
+            }
+        });
+        return allData;
+    }
+
+    let expenses = getMergedExpenses();
+
+    // Auto-Save back to Master Key
+    function saveMasterData() {
+        localStorage.setItem('mr_expenses_master', JSON.stringify(expenses));
+    }
+    saveMasterData();
+
+    // Expanded Multi-Language Semantic Auto-Category Engine
     const smartRules = [
         { 
             category: 'ہوٹلنگ / کھانا', 
-            keywords: ['حریسہ', 'حلیم', 'روٹی', 'سالن', 'بریانی', 'چائے', 'ہوٹل', 'کھانا', 'برگر', 'پیزا', 'شوارما', 'کباب', 'تکہ', 'کڑاہی', 'نہاری', 'پائے', 'ناشتہ', 'مٹھائی', 'جلیبی', 'سموسہ', 'پکوڑے', 'دودھ', 'دہی', 'جوس', 'آئس کریم', 'کوکا کولا', 'کافی', 'فاسٹ فوڈ'] 
+            keywords: ['حریسہ', 'حلیم', 'روٹی', 'سالن', 'بریانی', 'چائے', 'ہوٹل', 'کھانا', 'برگر', 'پیزا', 'شوارما', 'کباب', 'تکہ', 'کڑاہی', 'نہاری', 'پائے', 'ناشتہ', 'مٹھائی', 'جلیبی', 'سموسہ', 'پکوڑے', 'دودھ', 'دہی', 'جوس', 'آئس کریم', 'کوکا کولا', 'کافی', 'فاسٹ فوڈ', 'فرائز', 'ونگز', 'زنگر', 'شوربا', 'سٹیک'] 
         },
         { 
             category: 'راشن / گروسری', 
-            keywords: ['چینی', 'پتی', 'دال', 'چاول', 'گھی', 'تیل', 'صابن', 'سودا', 'راشن', 'آٹا', 'مسالے', 'سبزی', 'پھل', 'سیب', 'کیلا', 'گوشت', 'مرغی', 'چکن', 'بیف', 'مٹن', 'مچھلی'] 
+            keywords: ['چینی', 'پتی', 'دال', 'چاول', 'گھی', 'تیل', 'صابن', 'سودا', 'راشن', 'آٹا', 'مسالے', 'سبزی', 'پھل', 'سیب', 'کیلا', 'گوشت', 'مرغی', 'چکن', 'بیف', 'مٹن', 'مچھلی', 'سرف', 'تپال'] 
         },
         { 
-            category: 'کنسٹرکشن / تعمیرات', 
-            keywords: ['سیمنٹ', 'بجری', 'اینٹ', 'ریت', 'کنسٹرکشن', 'تعمیر', 'پینٹ', 'لوہا', 'سریا', 'پائپ', 'ٹائل', 'مزدوری', 'مستری'] 
+            category: 'میڈیکل / صحت', 
+            keywords: ['دوائی', 'میڈیسن', 'ڈاکٹر', 'سیرپ', 'ٹیبلٹ', 'ٹیسٹ', 'لیب', 'ہسپتال', 'میڈیکل', 'پٹی', 'انجکشن', 'کلینک', 'فیبر'] 
         },
         { 
-            category: 'موبائل / کریڈٹ', 
-            keywords: ['پیکج', 'موبائل', 'ایزی لوڈ', 'بیلنس', 'کال', 'نیٹ', 'ڈیٹا', 'جاز', 'زونگ', 'ٹیلی نار', 'وارد', 'یو فون'] 
-        },
-        { 
-            category: 'اسٹیشنری / پرنٹنگ', 
-            keywords: ['فوٹو کاپی', 'کاپی', 'پرنٹ', 'کاغذ', 'پنسل', 'پین', 'اسٹیشنری', 'کتاب', 'رجسٹر', 'فائل', 'بائنڈنگ'] 
-        },
-        { 
-            category: 'گاڑی / فیول', 
-            keywords: ['پیٹرول', 'ڈیزل', 'ٹیوننگ', 'سروس', 'انجن', 'مائل', 'واش', 'ٹائر', 'گاڑی', 'موٹر سائیکل', 'بائیک', 'مکینک', 'پنکچر', 'ائل'] 
+            category: 'الیکٹرانکس / ڈیوائس', 
+            keywords: ['چارجر', 'ڈیٹا کیبل', 'ہینڈز فری', 'ہیڈ فون', 'مائیک', 'کور', 'گلاس', 'ایئرپوڈز', 'کیبل', 'پاور بینک', 'موبائل لوازمات'] 
         },
         { 
             category: 'بل / یوٹیلیٹی', 
-            keywords: ['بجلی', 'گیس', 'پانی', 'انٹرنیٹ', 'بل', 'وایفائی', 'کیبل'] 
+            keywords: ['بجلی', 'گیس', 'پانی', 'انٹرنیٹ', 'بل', 'وایفائی', 'وائی فائی', 'کیبل', 'نیپرا', 'گیپکو', 'پی ٹی سی ایل'] 
+        },
+        { 
+            category: 'فنانس / ٹرانسفر', 
+            keywords: ['جیز کیش', 'ایزی پیسہ', 'بینک', 'کیش', 'ٹرانسفر', 'فیس', 'آن لائن', 'اے ٹی ایم', 'سنیپ'] 
+        },
+        { 
+            category: 'کنسٹرکشن / تعمیرات', 
+            keywords: ['سیمنٹ', 'بجری', 'اینٹ', 'ریت', 'کنسٹرکشن', 'تعمیر', 'پینٹ', 'لوہا', 'سریا', 'پائپ', 'ٹائل', 'مزدوری', 'مستری', 'ہارڈویئر'] 
+        },
+        { 
+            category: 'موبائل / کریڈٹ', 
+            keywords: ['پیکج', 'موبائل', 'ایزی لوڈ', 'بیلنس', 'کال', 'نیٹ', 'ڈیٹا', 'جاز', 'زونگ', 'ٹیلی نار', 'وارد', 'یو فون', 'جازپیکج'] 
+        },
+        { 
+            category: 'اسٹیشنری / پرنٹنگ', 
+            keywords: ['فوٹو کاپی', 'کاپی', 'پرنٹ', 'کاغذ', 'پنسل', 'پین', 'اسٹیشنری', 'کتاب', 'رجسٹر', 'فائل', 'بائنڈنگ', 'شاپ'] 
+        },
+        { 
+            category: 'گاڑی / فیول', 
+            keywords: ['پیٹرول', 'ڈیزل', 'ٹیوننگ', 'سروس', 'انجن', 'مائل', 'واش', 'ٹائر', 'گاڑی', 'موٹر سائیکل', 'بائیک', 'مکینک', 'پنکچر', 'ائل', 'تیل بائیک'] 
         }
     ];
 
-    function autoDetectCategory(text) {
+    function smartDetectCategory(text) {
         if (!text) return;
         const select = document.getElementById('category');
+        let cleanText = text.toLowerCase().trim();
         let matchedCategory = null;
 
         for (let rule of smartRules) {
-            if (rule.keywords.some(kw => text.includes(kw))) {
+            if (rule.keywords.some(kw => cleanText.includes(kw.toLowerCase()))) {
                 matchedCategory = rule.category;
                 break;
             }
@@ -442,7 +505,7 @@
 
         const amount = amountInput.value.trim();
         const desc = descInput.value.trim();
-        const category = categorySelect.value;
+        let category = categorySelect.value;
 
         if (!amount || !desc) {
             alert('براہ کرم رقم اور تفصیل دونوں درج کریں۔');
@@ -471,7 +534,7 @@
     }
 
     function saveAndRender() {
-        localStorage.setItem('mr_expenses_final', JSON.stringify(expenses));
+        saveMasterData();
         render(expenses);
     }
 
@@ -487,6 +550,7 @@
             return;
         }
 
+        // On Screen Display
         let html = '<div class="no-print">';
         data.forEach(item => {
             html += `
@@ -504,83 +568,33 @@
         });
         html += '</div>';
 
+        // Perfect Print Table Format for PDF
         html += `
-            <div class="printable-only" style="display:none;">
-                <h2 style="text-align:center; margin-bottom:5px;">Muhammad Rasoolnagri</h2>
-                <p style="text-align:center; margin-top:0; font-size:12px;">اخراجات رپورٹ - تاریخ: ${new Date().toLocaleDateString('en-GB')}</p>
-                <table class="print-table">
-                    <thead>
+            <table class="print-table">
+                <thead>
+                    <tr>
+                        <th>تاریخ</th>
+                        <th>تفصیل</th>
+                        <th>کیٹگری</th>
+                        <th>رقم</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.map(i => `
                         <tr>
-                            <th>تاریخ</th>
-                            <th>تفصیل</th>
-                            <th>کیٹگری</th>
-                            <th>رقم</th>
+                            <td>${i.date}</td>
+                            <td>${i.desc}</td>
+                            <td>${i.category}</td>
+                            <td>Rs ${i.amount.toLocaleString()}</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        ${data.map(i => `
-                            <tr>
-                                <td>${i.date}</td>
-                                <td>${i.desc}</td>
-                                <td>${i.category}</td>
-                                <td>Rs ${i.amount}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-                <h3 style="text-align:left; margin-top:15px;">کل خرچ: Rs ${total.toLocaleString()}</h3>
-            </div>
+                    `).join('')}
+                </tbody>
+            </table>
+            <h3 style="text-align:left; margin-top:15px;" class="printable-only">کل خرچ: Rs ${total.toLocaleString()}</h3>
         `;
 
         listContainer.innerHTML = html;
     }
 
     function filterRecords(type) {
-        document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
-        document.getElementById('btn-' + type).classList.add('active');
-
-        const now = new Date();
-        let filtered = expenses;
-
-        if (type === 'today') {
-            const todayStr = now.toLocaleDateString('en-GB');
-            filtered = expenses.filter(i => i.date === todayStr);
-        } else if (type === 'week') {
-            const weekAgo = new Date(now.setDate(now.getDate() - 7));
-            filtered = expenses.filter(i => new Date(i.id) >= weekAgo);
-        } else if (type === 'month') {
-            const currentMonth = new Date().getMonth();
-            filtered = expenses.filter(i => new Date(i.id).getMonth() === currentMonth);
-        }
-
-        render(filtered);
-    }
-
-    function printPDF() {
-        window.print();
-    }
-
-    function exportToExcel() {
-        let csv = 'Date,Description,Category,Amount\n';
-        expenses.forEach(i => {
-            csv += `"${i.date}","${i.desc}","${i.category}","${i.amount}"\n`;
-        });
-
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'Mera_Hisab_Report_' + Date.now() + '.csv';
-        link.click();
-    }
-
-    function toggleTheme() {
-        document.body.classList.toggle('dark-mode');
-        const icon = document.getElementById('themeIcon');
-        icon.innerText = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
-    }
-
-    render();
-</script>
-
-</body>
-</html>
+        document.querySelectorAll('.filters button').forEach(b => b.class
