@@ -256,49 +256,12 @@
             font-weight: bold;
             width: 100%;
         }
-
-        /* Fixed PDF Print Styling */
-        @media print {
-            body {
-                background: #fff !important;
-                color: #000 !important;
-                padding: 0 !important;
-            }
-            .container {
-                box-shadow: none !important;
-                max-width: 100% !important;
-                width: 100% !important;
-                padding: 0 !important;
-            }
-            .no-print {
-                display: none !important;
-            }
-            .print-header {
-                text-align: center;
-                margin-bottom: 20px;
-            }
-            .print-table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 15px;
-            }
-            .print-table th, .print-table td {
-                border: 1px solid #444;
-                padding: 8px;
-                text-align: right;
-                font-size: 14px;
-            }
-            .print-table th {
-                background-color: #f2f2f2 !important;
-                font-weight: bold;
-            }
-        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header-top no-print">
+    <div class="header-top">
         <button class="theme-toggle" onclick="toggleTheme()" id="themeIcon">🌙</button>
     </div>
 
@@ -317,7 +280,7 @@
         <strong id="totalExpenseDisplay">Rs 0</strong>
     </div>
 
-    <div class="no-print">
+    <div>
         <div class="form-group">
             <label>رقم (روپے):</label>
             <input type="number" id="amount" placeholder="مثلاً 500">
@@ -362,16 +325,10 @@
         </div>
     </div>
 
-    <!-- Printable & Screen Report Area -->
-    <div id="printableArea">
-        <div class="print-header">
-            <h2 style="margin:0;">Muhammad Rasoolnagri</h2>
-            <p style="margin:5px 0; font-size:13px;">اخراجات رپورٹ / رسید</p>
-        </div>
-        <div id="expensesList"></div>
-    </div>
+    <!-- Expenses List Area -->
+    <div id="expensesList" style="margin-top: 15px;"></div>
 
-    <div class="action-btns no-print">
+    <div class="action-btns" style="margin-top: 20px;">
         <button class="btn-excel" onclick="exportToExcel()">Excel Backup ڈاؤن لوڈ کریں</button>
         <button class="btn-pdf" onclick="printPDF()">رسید / رپورٹ پرنٹ کریں (PDF)</button>
     </div>
@@ -398,7 +355,6 @@
                     if (Array.isArray(parsed)) {
                         parsed.forEach(exp => {
                             if (exp && exp.amount) {
-                                // Filtering expenses only
                                 if (!exp.type || exp.type === 'expense') {
                                     let uniqueId = exp.id || (exp.desc + exp.amount + exp.date);
                                     if (!seenIds.has(uniqueId)) {
@@ -423,7 +379,6 @@
 
     let expenses = getMergedExpenses();
 
-    // Auto-Save back to Master Key
     function saveMasterData() {
         localStorage.setItem('mr_expenses_master', JSON.stringify(expenses));
     }
@@ -550,8 +505,7 @@
             return;
         }
 
-        // On Screen Display
-        let html = '<div class="no-print">';
+        let html = '';
         data.forEach(item => {
             html += `
                 <div class="list-item">
@@ -566,35 +520,65 @@
                 </div>
             `;
         });
-        html += '</div>';
-
-        // Perfect Print Table Format for PDF
-        html += `
-            <table class="print-table">
-                <thead>
-                    <tr>
-                        <th>تاریخ</th>
-                        <th>تفصیل</th>
-                        <th>کیٹگری</th>
-                        <th>رقم</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${data.map(i => `
-                        <tr>
-                            <td>${i.date}</td>
-                            <td>${i.desc}</td>
-                            <td>${i.category}</td>
-                            <td>Rs ${i.amount.toLocaleString()}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-            <h3 style="text-align:left; margin-top:15px;" class="printable-only">کل خرچ: Rs ${total.toLocaleString()}</h3>
-        `;
 
         listContainer.innerHTML = html;
     }
 
     function filterRecords(type) {
-        document.querySelectorAll('.filters button').forEach(b => b.class
+        document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-' + type).classList.add('active');
+
+        const now = new Date();
+        let filtered = expenses;
+
+        if (type === 'today') {
+            const todayStr = now.toLocaleDateString('en-GB');
+            filtered = expenses.filter(i => i.date === todayStr);
+        } else if (type === 'week') {
+            const weekAgo = new Date(now.setDate(now.getDate() - 7));
+            filtered = expenses.filter(i => new Date(i.id) >= weekAgo);
+        } else if (type === 'month') {
+            const currentMonth = new Date().getMonth();
+            filtered = expenses.filter(i => new Date(i.id).getMonth() === currentMonth);
+        }
+
+        render(filtered);
+    }
+
+    // Dedicated Clean Print Window for Perfect PDF Generation
+    function printPDF() {
+        let total = expenses.reduce((sum, item) => sum + item.amount, 0);
+        let printWindow = window.open('', '_blank');
+        
+        let htmlContent = `
+            <!DOCTYPE html>
+            <html lang="ur" dir="rtl">
+            <head>
+                <meta charset="UTF-8">
+                <title>Muhammad Rasoolnagri - Expense Report</title>
+                <style>
+                    body { font-family: Tahoma, sans-serif; padding: 20px; color: #000; direction: rtl; }
+                    h2, p { text-align: center; margin: 5px 0; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #333; padding: 10px; text-align: right; font-size: 14px; }
+                    th { background-color: #f2f2f2; }
+                    .total { margin-top: 15px; font-size: 18px; font-weight: bold; text-align: left; }
+                </style>
+            </head>
+            <body>
+                <h2>Muhammad Rasoolnagri</h2>
+                <p>روزمرہ اخراجات کی رپورٹ / رسید</p>
+                <p style="font-size: 12px; color: #666;">تاریخ: ${new Date().toLocaleDateString('en-GB')}</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>تاریخ</th>
+                            <th>تفصیل</th>
+                            <th>کیٹگری</th>
+                            <th>رقم</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${expenses.map(i => `
+                            <tr>
+ 
