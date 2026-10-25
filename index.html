@@ -1,74 +1,348 @@
+Enter
 <!DOCTYPE html>
 <html lang="ur" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>روزمرہ کا حساب کتاب - Muhammad Rasoolnagri</title>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1b4d3e">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
     <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        body { font-family: 'Poppins', 'Noto Nastaliq Urdu', sans-serif; background: #f4f7f6; margin: 0; padding: 15px; display: flex; justify-content: center; color: #333; }
-        .container { width: 100%; max-width: 500px; background: #ffffff; padding: 20px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
-        .brand-section { text-align: center; margin-bottom: 20px; }
-        .logo-badge { width: 60px; height: 60px; background: #1b4d3e; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; margin: 0 auto 8px auto; }
-        .dashboard-single { background: #c62828; color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; }
-        button.btn-primary { width: 100%; background-color: #1b4d3e; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
-        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; }
-        .btn-download { background-color: #c62828; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; width: 100%; margin-top: 15px; cursor: pointer; text-align: center; }
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --primary: #1b4d3e;
+            --expense-color: #c62828;
+            --border-color: #e0e0e0;
+        }
+
+        body.dark-mode {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --border-color: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Noto Nastaliq Urdu', Tahoma, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 15px;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        .brand-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo-badge {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #1b4d3e, #2c7a5f);
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0 auto 8px auto;
+            box-shadow: 0 4px 10px rgba(27, 77, 62, 0.3);
+        }
+
+        .developer-tag {
+            font-size: 11px;
+            color: #777777;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        .brand-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 2px 0 0 0;
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--primary);
+            margin-top: 10px;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .dashboard-single {
+            background: linear-gradient(135deg, #c62828, #e53935);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(198, 40, 40, 0.2);
+        }
+
+        .dashboard-single span {
+            font-size: 14px;
+            display: block;
+            opacity: 0.9;
+        }
+
+        .dashboard-single strong {
+            font-size: 28px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 15px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        button.btn-primary {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(27, 77, 62, 0.2);
+        }
+
+        .filters {
+            display: flex;
+            gap: 6px;
+            margin: 20px 0 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .filters button {
+            flex: 1;
+            padding: 8px;
+            font-size: 13px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .filters button.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .custom-date {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .list-item-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .list-item-title {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .list-item-sub {
+            font-size: 12px;
+            color: #888888;
+            margin-top: 2px;
+        }
+
+        .list-item-amount {
+            font-weight: bold;
+            font-size: 16px;
+            color: var(--expense-color);
+        }
+
+        .action-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-excel {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
+
+        .btn-download-file {
+            background-color: #c62828;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <div class="header-top">
+        <button class="theme-toggle" onclick="toggleTheme()" id="themeIcon">🌙</button>
+    </div>
+
     <div class="brand-section">
         <div class="logo-badge">MR</div>
-        <p style="font-size: 11px; color: #777; margin:0;">DEVELOPED BY</p>
-        <h3 style="font-size: 18px; color: #1b4d3e; margin: 2px 0 0 0;">Muhammad Rasoolnagri</h3>
+        <p class="developer-tag">DEVELOPED BY</p>
+        <h3 class="brand-name">Muhammad Rasoolnagri</h3>
     </div>
 
     <h2>روزمرہ کا حساب کتاب</h2>
 
     <div class="dashboard-single">
         <span>کل خرچ (Total Expenses)</span>
-        <strong id="totalExpenseDisplay" style="font-size: 28px; display: block; margin-top: 5px;">Rs 0</strong>
+        <strong id="totalExpenseDisplay">Rs 0</strong>
     </div>
 
-    <div class="form-group">
-        <label>رقم (روپے):</label>
-        <input type="number" id="amount" placeholder="مثلاً 500">
-    </div>
+    <div>
+        <div class="form-group">
+            <label>رقم (روپے):</label>
+            <input type="number" id="amount" placeholder="مثلاً 500">
+        </div>
 
-    <div class="form-group">
-        <label>تفصیل / مد:</label>
-        <input type="text" id="desc" placeholder="مثلاً بیڈ، چارپائی، پیزا، ریت" oninput="smartDetectCategory(this.value)">
-    </div>
+        <div class="form-group">
+            <label>تفصیل / مد (ذہین آٹو کیٹگری ڈٹیکٹر):</label>
+            <input type="text" id="desc" placeholder="مثلاً بیڈ، چارپائی، فرائز، چارجر" oninput="smartDetectCategory(this.value)">
+        </div>
 
-    <div class="form-group">
-        <label>کیٹگری:</label>
-        <select id="category">
-            <option value="عام (General)">عام (General)</option>
-            <option value="فرنیچر / گھریلو سامان">فرنیچر / گھریلو سامان</option>
-            <option value="ہوٹلنگ / کھانا">ہوٹلنگ / کھانا</option>
-            <option value="راشن / گروسری">راشن / گروسری</option>
-            <option value="کنسٹرکشن / تعمیرات">کنسٹرکشن / تعمیرات</option>
-            <option value="الیکٹرانکس / ڈیوائس">الیکٹرانکس / ڈیوائس</option>
-        </select>
-    </div>
+        <div class="form-group">
+            <label>کیٹگری:</label>
+            <select id="category">
+                <option value="عام (General)">عام (General)</option>
+                <option value="فرنیچر / گھریلو سامان">فرنیچر / گھریلو سامان</option>
+                <option value="ہوٹلنگ / کھانا">ہوٹلنگ / کھانا</option>
+                <option value="راشن / گروسری">راشن / گروسری</option>
+                <option value="گاڑی / فیول">گاڑی / فیول</option>
+                <option value="کنسٹرکشن / تعمیرات">کنسٹرکشن / تعمیرات</option>
+                <option value="موبائل / کریڈٹ">موبائل / کریڈٹ</option>
+                <option value="اسٹیشنری / پرنٹنگ">اسٹیشنری / پرنٹنگ</option>
+                <option value="بل / یوٹیلیٹی">بل / یوٹیلیٹی</option>
+                <option value="میڈیکل / صحت">میڈیکل / صحت</option>
+                <option value="الیکٹرانکس / ڈیوائس">الیکٹرانکس / ڈیوائس</option>
+                <option value="فنانس / ٹرانسفر">فنانس / ٹرانسفر</option>
+            </select>
+        </div>
 
-    <button class="btn-primary" onclick="addExpense()">محفوظ کریں</button>
+        <button class="btn-primary" onclick="addExpense()">محفوظ کریں</button>
+        <hr style="margin: 20px 0; border: 0.1px solid var(--border-color);">
+
+        <div class="filters">
+            <button onclick="filterRecords('all')" id="btn-all" class="active">تمام ریکارڈ</button>
+            <button onclick="filterRecords('today')" id="btn-today">آج</button>
+            <button onclick="filterRecords('week')" id="btn-week">اس ہفتے</button>
+            <button onclick="filterRecords('month')" id="btn-month">اس ماہ</button>
+        </div>
+
+        <div class="custom-date">
+            <input type="date" id="startDate">
+            <input type="date" id="endDate">
+            <button onclick="filterCustomDate()" style="width: auto; padding: 6px 12px;">تلاش</button>
+        </div>
+    </div>
 
     <div id="expensesList" style="margin-top: 15px;"></div>
 
-    <button class="btn-download" onclick="downloadReceiptFile()">رسید فائل ڈاؤن لوڈ کریں</button>
+    <div class="action-btns" style="margin-top: 20px;">
+        <button class="btn-excel" onclick="exportToExcel()">Excel Backup ڈاؤن لوڈ کریں</button>
+        <button class="btn-download-file" onclick="downloadCleanReceipt()">رسید فائل ڈاؤن لوڈ کریں (HTML)</button>
+    </div>
 </div>
 
 <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
+        });
+    }
+
     function getMergedExpenses() {
         let keys = ['mr_expenses_master', 'mr_expenses_ai_v1', 'mr_expenses_v2', 'mr_expenses_only', 'expenses'];
         let allData = [];
         let seenIds = new Set();
+
         keys.forEach(key => {
             let item = localStorage.getItem(key);
             if (item) {
@@ -77,16 +351,18 @@
                     if (Array.isArray(parsed)) {
                         parsed.forEach(exp => {
                             if (exp && exp.amount) {
-                                let uniqueId = exp.id || (exp.desc + exp.amount + exp.date);
-                                if (!seenIds.has(uniqueId)) {
-                                    seenIds.add(uniqueId);
-                                    allData.push({
-                                        id: exp.id || Date.now() + Math.random(),
-                                        amount: parseFloat(exp.amount),
-                                        desc: exp.desc || 'خرچ',
-                                        category: exp.category || 'عام (General)',
-                                        date: exp.date || new Date().toLocaleDateString('en-GB')
-                                    });
+                                if (!exp.type || exp.type === 'expense') {
+                                    let uniqueId = exp.id || (exp.desc + exp.amount + exp.date);
+                                    if (!seenIds.has(uniqueId)) {
+                                        seenIds.add(uniqueId);
+                                        allData.push({
+                                            id: exp.id || Date.now() + Math.random(),
+                                            amount: parseFloat(exp.amount),
+                                            desc: exp.desc || 'خرچ',
+                                            category: exp.category || 'عام (General)',
+                                            date: exp.date || new Date().toLocaleDateString('en-GB')
+                                        });
+                                    }
                                 }
                             }
                         });
@@ -98,84 +374,195 @@
     }
 
     let expenses = getMergedExpenses();
-    function saveMasterData() { localStorage.setItem('mr_expenses_master', JSON.stringify(expenses)); }
+
+    function saveMasterData() {
+        localStorage.setItem('mr_expenses_master', JSON.stringify(expenses));
+    }
     saveMasterData();
 
     const smartRules = [
-        { category: 'فرنیچر / گھریلو سامان', keywords: ['بیڈ', 'چارپائی', 'صوفہ', 'کرسی', 'میز', 'ٹیبل', 'الماری', 'گدا'] },
-        { category: 'ہوٹلنگ / کھانا', keywords: ['پیزا', 'برگر', 'روٹی', 'سالن', 'بریانی', 'چائے', 'حریسہ', 'فرائز', 'ونگز'] },
-        { category: 'کنسٹرکشن / تعمیرات', keywords: ['ریت', 'مستری', 'سیمنٹ', 'بجری', 'اینٹ', 'سریا'] },
-        { category: 'الیکٹرانکس / ڈیوائس', keywords: ['چارجر', 'کیبل', 'موبایل', 'ہینڈز فری'] }
+        { category: 'فرنیچر / گھریلو سامان', keywords: ['بیڈ', 'چارپائی', 'صوفہ', 'کرسی', 'میز', 'ٹیبل', 'الماری', 'گدا', 'میٹرس', 'پردے', 'فرنیچر', 'چادر', 'تکیہ', 'فوم'] },
+        { category: 'ہوٹلنگ / کھانا', keywords: ['حریسہ', 'حلیم', 'روٹی', 'سالن', 'بریانی', 'چائے', 'ہوٹل', 'کھانا', 'برگر', 'پیزا', 'شوارما', 'کباب', 'تکہ', 'کڑاہی', 'نہاری', 'پائے', 'ناشتہ', 'مٹھائی', 'جلیبی', 'سموسہ', 'پکوڑے', 'دودھ', 'دہی', 'جوس', 'آئس کریم', 'کوکا کولا', 'کافی', 'فاسٹ فوڈ', 'فرائز', 'ونگز', 'زنگر', 'شوربا', 'سٹیک'] },
+        { category: 'راشن / گروسری', keywords: ['چینی', 'پتی', 'دال', 'چاول', 'گھی', 'تیل', 'صابن', 'سودا', 'راشن', 'آٹا', 'مسالے', 'سبزی', 'پھل', 'سیب', 'کیلا', 'گوشت', 'مرغی', 'چکن', 'بیف', 'مٹن', 'مچھلی', 'سرف', 'تپال'] },
+        { category: 'میڈیکل / صحت', keywords: ['دوائی', 'میڈیسن', 'ڈاکٹر', 'سیرپ', 'ٹیبلٹ', 'ٹیسٹ', 'لیب', 'ہسپتال', 'میڈیکل', 'پٹی', 'انجکشن', 'کلینک', 'فیبر'] },
+        { category: 'الیکٹرانکس / ڈیوائس', keywords: ['چارجر', 'ڈیٹا کیبل', 'ہینڈز فری', 'ہیڈ فون', 'مائیک', 'کور', 'گلاس', 'ایئرپوڈز', 'کیبل', 'پاور بینک', 'موبائل لوازمات'] },
+        { category: 'بل / یوٹیلیٹی', keywords: ['بجلی', 'گیس', 'پانی', 'انٹرنیٹ', 'بل', 'وایفائی', 'وائی فائی', 'کیبل', 'نیپرا', 'گیپکو', 'پی ٹی سی ایل'] },
+        { category: 'فنانس / ٹرانسفر', keywords: ['جیز کیش', 'ایزی پیسہ', 'بینک', 'کیش', 'ٹرانسفر', 'فیس', 'آن لائن', 'اے ٹی ایم', 'سنیپ'] },
+        { category: 'کنسٹرکشن / تعمیرات', keywords: ['سیمنٹ', 'بجری', 'اینٹ', 'ریت', 'کنسٹرکشن', 'تعمیر', 'پینٹ', 'لوہا', 'سریا', 'پائپ', 'ٹائل', 'مزدوری', 'مستری', 'ہارڈویئر'] },
+        { category: 'موبائل / کریڈٹ', keywords: ['پیکج', 'موبائل', 'ایزی لوڈ', 'بیلنس', 'کال', 'نیٹ', 'ڈیٹا', 'جاز', 'زونگ', 'ٹیلی نار', 'وارد', 'یو فون', 'جازپیکج'] },
+        { category: 'اسٹیشنری / پرنٹنگ', keywords: ['فوٹو کاپی', 'کاپی', 'پرنٹ', 'کاغذ', 'پنسل', 'پین', 'اسٹیشنری', 'کتاب', 'رجسٹر', 'فائل', 'بائنڈنگ', 'شاپ'] },
+        { category: 'گاڑی / فیول', keywords: ['پیٹرول', 'ڈیزل', 'ٹیوننگ', 'سروس', 'انجن', 'مائل', 'واش', 'ٹائر', 'گاڑی', 'موٹر سائیکل', 'بائیک', 'مکینک', 'پنکچر', 'ائل', 'تیل بائیک'] }
     ];
 
     function smartDetectCategory(text) {
         if (!text) return;
         const select = document.getElementById('category');
         let cleanText = text.toLowerCase().trim();
+        let matchedCategory = null;
+
         for (let rule of smartRules) {
             if (rule.keywords.some(kw => cleanText.includes(kw.toLowerCase()))) {
-                select.value = rule.category;
+                matchedCategory = rule.category;
                 break;
             }
+        }
+
+        if (matchedCategory) {
+            let optionExists = Array.from(select.options).some(opt => opt.value === matchedCategory);
+            if (!optionExists) {
+                let newOpt = document.createElement('option');
+                newOpt.value = matchedCategory;
+                newOpt.innerText = matchedCategory;
+                select.appendChild(newOpt);
+            }
+            select.value = matchedCategory;
         }
     }
 
     function addExpense() {
-        const amount = document.getElementById('amount').value.trim();
-        const desc = document.getElementById('desc').value.trim();
-        const category = document.getElementById('category').value;
-        if (!amount || !desc) { alert('رقم اور تفصیل درج کریں'); return; }
-        expenses.unshift({ id: Date.now(), amount: parseFloat(amount), desc, category, date: new Date().toLocaleDateString('en-GB') });
-        saveMasterData();
-        render();
-        document.getElementById('amount').value = '';
-        document.getElementById('desc').value = '';
+        const amountInput = document.getElementById('amount');
+        const descInput = document.getElementById('desc');
+        const categorySelect = document.getElementById('category');
+
+        const amount = amountInput.value.trim();
+        const desc = descInput.value.trim();
+        let category = categorySelect.value;
+
+        if (!amount || !desc) {
+            alert('براہ کرم رقم اور تفصیل دونوں درج کریں۔');
+            return;
+        }
+
+        const item = {
+            id: Date.now(),
+            amount: parseFloat(amount),
+            desc: desc,
+            category: category,
+            date: new Date().toLocaleDateString('en-GB')
+        };
+
+        expenses.unshift(item);
+        saveAndRender();
+
+        amountInput.value = '';
+        descInput.value = '';
+        categorySelect.value = 'عام (General)';
     }
 
     function deleteExpense(id) {
-        expenses = expenses.filter(i => i.id !== id);
-        saveMasterData();
-        render();
+        expenses = expenses.filter(item => item.id !== id);
+        saveAndRender();
     }
 
-    function render() {
+    function saveAndRender() {
+        saveMasterData();
+        render(expenses);
+    }
+
+    function render(data = expenses) {
         const listContainer = document.getElementById('expensesList');
-        let total = expenses.reduce((sum, i) => sum + i.amount, 0);
-        document.getElementById('totalExpenseDisplay').innerText = 'Rs ' + total.toLocaleString();
-        if (expenses.length === 0) { listContainer.innerHTML = '<p style="text-align:center; color:#888;">کوئی ریکارڈ موجود نہیں</p>'; return; }
+        const totalDisplay = document.getElementById('totalExpenseDisplay');
+
+        let total = data.reduce((sum, item) => sum + item.amount, 0);
+        totalDisplay.innerText = 'Rs ' + total.toLocaleString();
+
+        if (data.length === 0) {
+            listContainer.innerHTML = '<p style="text-align:center; color:#888; padding:20px;">کوئی ریکارڈ موجود نہیں ہے۔</p>';
+            return;
+        }
+
         let html = '';
-        expenses.forEach(i => {
-            html += `<div class="list-item">
-                <div><strong>${i.desc}</strong><br><small style="color:#777;">${i.category} | ${i.date}</small></div>
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span style="color:#c62828; font-weight:bold;">Rs ${i.amount}</span>
-                    <button onclick="deleteExpense(${i.id})" style="background:none; border:none; cursor:pointer;">🗑️</button>
+        data.forEach(item => {
+            html += `
+                <div class="list-item">
+                    <div class="list-item-details">
+                        <span class="list-item-title">${item.desc}</span>
+                        <span class="list-item-sub">${item.category} | ${item.date}</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span class="list-item-amount">Rs ${item.amount} -</span>
+                        <button onclick="deleteExpense(${item.id})" style="background:none; border:none; color:#c62828; cursor:pointer; font-size:16px;">🗑️</button>
+                    </div>
                 </div>
-            </div>`;
+            `;
         });
+
         listContainer.innerHTML = html;
     }
 
-    function downloadReceiptFile() {
-        let total = expenses.reduce((sum, i) => sum + i.amount, 0);
-        let htmlContent = `<!DOCTYPE html><html lang="ur" dir="rtl"><head><meta charset="UTF-8"><title>رسید</title></head><body style="font-family: Tahoma; padding: 20px; direction: rtl;">
-        <h2 style="color: #1b4d3e; text-align: center;">Muhammad Rasoolnagri</h2>
-        <p style="text-align: center;">روزمرہ اخراجات کی رپورٹ</p>
-        <table border="1" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-        <tr><th>تاریخ</th><th>تفصیل</th><th>کیٹگری</th><th>رقم</th></tr>
-        ${expenses.map(i => `<tr><td>${i.date}</td><td>${i.desc}</td><td>${i.category}</td><td>Rs ${i.amount}</td></tr>`).join('')}
-        </table>
-        <h3 style="text-align: left; color: #c62828; margin-top: 20px;">کل خرچ: Rs ${total}</h3></body></html>`;
-        
-        let blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
-        let link = document.createElement('a');
+    function filterRecords(type) {
+        document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-' + type).classList.add('active');
+
+        const now = new Date();
+        let filtered = expenses;
+
+        if (type === 'today') {
+            const todayStr = now.toLocaleDateString('en-GB');
+            filtered = expenses.filter(i => i.date === todayStr);
+        } else if (type === 'week') {
+            const weekAgo = new Date(now.setDate(now.getDate() - 7));
+            filtered = expenses.filter(i => new Date(i.id) >= weekAgo);
+        } else if (type === 'month') {
+            const currentMonth = new Date().getMonth();
+            filtered = expenses.filter(i => new Date(i.id).getMonth() === currentMonth);
+        }
+
+        render(filtered);
+    }
+
+    function downloadCleanReceipt() {
+        let total = expenses.reduce((sum, item) => sum + item.amount, 0);
+        let receiptHtml = `<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Muhammad Rasoolnagri - Expense Receipt</title>
+<style>
+body { font-family: Tahoma, sans-serif; padding: 25px; color: #222; direction: rtl; background: #fff; }
+.receipt-card { max-width: 600px; margin: auto; border: 2px solid #1b4d3e; padding: 25px; border-radius: 12px; }
+h2, p { text-align: center; margin: 5px 0; color: #1b4d3e; }
+table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+th, td { border: 1px solid #1b4d3e; padding: 10px; text-align: right; font-size: 14px; }
+th { background-color: #1b4d3e; color: white; }
+.total-box { margin-top: 20px; font-size: 18px; font-weight: bold; text-align: left; color: #c62828; }
+</style>
+</head>
+<body>
+<div class="receipt-card">
+    <h2>Muhammad Rasoolnagri</h2>
+    <p>روزمرہ اخراجات کی رپورٹ / رسید</p>
+    <p style="font-size: 12px; color: #555;">تاریخ اجراء: ${new Date().toLocaleDateString('en-GB')}</p>
+    <table>
+        <thead>
+            <tr>
+                <th>تاریخ</th>
+                <th>تفصیل</th>
+                <th>کیٹگری</th>
+                <th>رقم</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${expenses.map(i => `
+                <tr>
+                    <td>${i.date}</td>
+                    <td>${i.desc}</td>
+                    <td>${i.category}</td>
+                    <td>Rs ${i.amount.toLocaleString()}</td>
+                </tr>
+            `).join('')}
+        </tbody>
+    </table>
+    <div class="total-box">کل خرچ: Rs ${total.toLocaleString()}</div>
+</div>
+</body>
+</html>`;
+
+        const blob = new Blob([receiptHtml], { type: 'text/html;charset=utf-8;' });
+        const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = 'Mera_Hisab_Receipt.html';
+        link.download = 'Mera_Hisab_Receipt_' + Date.now() + '.html';
         link.click();
     }
 
-    render();
-</script>
-</body>
-</html>
-
+    function e
